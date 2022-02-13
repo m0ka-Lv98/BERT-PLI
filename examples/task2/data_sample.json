@@ -13,4 +13,4 @@
 {"guid": "002_009", "text_a": "Content of the decision paragraph of the 2nd query case. ", "text_b": "Text of the 9th paragraph.", "label": 0}
 {"guid": "003_001", "text_a": "Content of the decision paragraph of the 3rd query case. ", "text_b": "Text of the 1st paragraph.", "label": 0}
 {"guid": "003_005", "text_a": "Content of the decision paragraph of the 3rd query case. ", "text_b": "Text of the 5th paragraph.", "label": 0}
-{"guid": "003_004", "text_a": "Content of the decision paragraph of the 3rd query case. ", "text_b": "Text of the 4th paragraph.", "label": 0}
+{"guid": "003_004", "text_a": "Content of the decision paragraph of the 3rd query case. ", "text_b": "Text of the 4th paragraph.", "label": 1}

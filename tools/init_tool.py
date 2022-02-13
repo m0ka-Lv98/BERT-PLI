@@ -39,6 +39,7 @@ def init_all(config, gpu_list, checkpoint, mode, *args, **params):
 
     try:
         parameters = torch.load(checkpoint)
+        print('loaded checkpoint')
         if mode == 'poolout':
             model = load_state_keywise(model, parameters["model"])
 
