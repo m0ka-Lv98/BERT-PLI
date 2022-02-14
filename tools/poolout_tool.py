@@ -38,7 +38,7 @@ def load_state_keywise(model, pretrained_dict):
 
 def pool_out(parameters, config, gpu_list, _outname):
     model = parameters["model"]
-    dataset = parameters["test_dataset"]
+    dataset = parameters["train_dataset"]
     model.eval()
 
     acc_result = None
@@ -62,6 +62,7 @@ def pool_out(parameters, config, gpu_list, _outname):
                     data[key] = Variable(data[key])
 
         results = model(data, config, gpu_list, acc_result, "poolout")
+        results["output"][0].append(data['label'].item())
         result = result + results["output"]
         cnt += 1
 
@@ -77,7 +78,8 @@ def pool_out(parameters, config, gpu_list, _outname):
             for item in result:
                 tmp_dict = {
                     'guid': item[0],
-                    'res': item[1]
+                    'res': item[1],
+                    'label': item[2]
                 }
                 out_line = json.dumps(tmp_dict, ensure_ascii=False) + '\n'
                 out_file.write(out_line)

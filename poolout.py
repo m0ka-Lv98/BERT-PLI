@@ -57,7 +57,8 @@ if __name__ == "__main__":
     for output in outputs:
         tmp_dict = {
             'guid': output[0],
-            'res': output[1]
+            'res': output[1],
+            'label': output[2]
         }
         out_line = json.dumps(tmp_dict, ensure_ascii=False) + '\n'
         out_file.write(out_line)
