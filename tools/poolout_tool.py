@@ -76,7 +76,7 @@ def pool_out(parameters, config, gpu_list, _outname):
             out_file = open(_outname, 'w', encoding='utf-8')
             for item in result:
                 tmp_dict = {
-                    'id_': item[0],
+                    'guid': item[0],
                     'res': item[1]
                 }
                 out_line = json.dumps(tmp_dict, ensure_ascii=False) + '\n'
