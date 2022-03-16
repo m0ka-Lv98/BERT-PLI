@@ -7,6 +7,7 @@ from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from tensorboardX import SummaryWriter
 from timeit import default_timer as timer
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -47,19 +48,23 @@ def output_value(epoch, mode, step, time, loss, info, end, config):
         print(s)
 
 
-def eval_micro_query(_result_list):
+def eval_micro_query(_result_list, th=1):
+    random.seed(0)
     label_dict = defaultdict(lambda: [])
     pred_dict = defaultdict(lambda: defaultdict(lambda: 0))
     for item in _result_list:
         guid = item[0]
         label = int(item[1])
         pred = np.argmax(item[2])
-        qid, cid = guid.split('_')
+        
+        try:
+            qid, cid = guid.split('_')
+        except:
+            continue
         if label > 0:
             label_dict[qid].append(cid)
         pred_dict[qid][cid] = pred
     assert (len(pred_dict) == len(label_dict))
-
     correct = 0
     label = 0
     predict = 0
@@ -67,6 +72,8 @@ def eval_micro_query(_result_list):
         label += len(label_dict[qid])
     for qid in pred_dict:
         for cid in pred_dict[qid]:
+            if cid in label_dict[qid] and random.random() > th:
+                continue
             if pred_dict[qid][cid] == 1:
                 predict += 1
                 if cid in label_dict[qid]:
@@ -84,7 +91,7 @@ def eval_micro_query(_result_list):
     return micro_prec_query, micro_recall_query, micro_f1_query
 
 
-def valid(model, dataset, epoch, writer, config, gpu_list, output_function, mode="valid"):
+def valid(model, dataset, epoch, writer, config, gpu_list, output_function, mode="valid", th=1):
     model.eval()
 
     acc_result = None
@@ -100,7 +107,7 @@ def valid(model, dataset, epoch, writer, config, gpu_list, output_function, mode
     if total_len < 10000:
         more = "\t"
     result = []
-
+    
     for step, data in enumerate(dataset):
         for key in data.keys():
             if isinstance(data[key], torch.Tensor):
@@ -137,7 +144,7 @@ def valid(model, dataset, epoch, writer, config, gpu_list, output_function, mode
                       epoch)
 
     # eval results based on query micro F1
-    micro_prec_query, micro_recall_query, micro_f1_query = eval_micro_query(result)
+    micro_prec_query, micro_recall_query, micro_f1_query = eval_micro_query(result, th)
     loss_tmp = total_loss / (step + 1)
     print('valid set: micro_prec_query=%.4f, micro_recall_query=%.4f, micro_f1_query=%.4f' %
           (micro_prec_query, micro_recall_query, micro_f1_query))
