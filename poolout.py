@@ -54,14 +54,15 @@ if __name__ == "__main__":
 
     out_file = open(args.result, 'w', encoding='utf-8')
     outputs = pool_out(parameters, config, gpu_list, args.result)
-    for output in outputs:
-        tmp_dict = {
-            'guid': output[0],
-            'res': output[1],
-            'label': output[2]
-        }
-        out_line = json.dumps(tmp_dict, ensure_ascii=False) + '\n'
-        out_file.write(out_line)
-    out_file.close()
+    #out_line = ''
+    #for output in outputs:
+    #    tmp_dict = {
+    #        'guid': output[0],
+    #        'res': output[1],
+    #        'label': output[2]
+    #    }
+    #    out_line += (json.dumps(tmp_dict, ensure_ascii=False) + '\n')
+    #out_file.write(out_line)
+    #out_file.close()
 
     # train(parameters, config, gpu_list)
