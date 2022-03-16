@@ -47,9 +47,10 @@ def init_one_dataset(config, mode, *args, **params):
         batch_size = config.getint("train", "batch_size")
         shuffle = config.getboolean("train", "shuffle")
         reader_num = config.getint("train", "reader_num")
-        drop_last = True
+        drop_last = False
         if mode in ["valid", "test"]:
-            if mode == "test":
+            if mode == "test" or mode == "valid":
+                mode = "valid"
                 drop_last = False
 
             try:
@@ -66,7 +67,7 @@ def init_one_dataset(config, mode, *args, **params):
                 reader_num = config.getint("eval", "reader_num")
             except Exception as e:
                 logger.warning("[eval] reader num has not been defined in config file, use [train] reader num instead.")
-
+        #import pdb; pdb.set_trace()
         dataloader = DataLoader(dataset=dataset,
                                 batch_size=batch_size,
                                 shuffle=shuffle,
@@ -88,11 +89,12 @@ def init_test_dataset(config, *args, **params):
 
 
 def init_dataset(config, *args, **params):
-    init_formatter(config, ["train", "valid"], *args, **params)
+    init_formatter(config, ["train", "valid", "test"], *args, **params)
     train_dataset = init_one_dataset(config, "train", *args, **params)
     valid_dataset = init_one_dataset(config, "valid", *args, **params)
+    test_dataset = init_one_dataset(config, "test", *args, **params)
 
-    return train_dataset, valid_dataset
+    return train_dataset, valid_dataset, test_dataset
 
 
 if __name__ == "__main__":

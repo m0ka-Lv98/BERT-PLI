@@ -71,9 +71,12 @@ def train(parameters, config, gpu_list):
 
     total_len = len(dataset)
     more = ""
+    max_f1 = -1
+    max_test_dataset = None
+    max_epoch = -1
     if total_len < 10000:
         more = "\t"
-    for epoch_num in range(trained_epoch, epoch):
+    for epoch_num in range(trained_epoch, epoch + 1):
         start_time = timer()
         current_epoch = epoch_num
 
@@ -131,4 +134,12 @@ def train(parameters, config, gpu_list):
             with torch.no_grad():
                 eval_res = valid(model, parameters["valid_dataset"], current_epoch, writer, config, gpu_list,
                                  output_function)
+                if eval_res['f1'] > max_f1:
+                    eval_res_test = valid(model, parameters["test_dataset"], current_epoch, writer, config, gpu_list,
+                                     output_function, th=1)
+                    max_f1 = eval_res['f1']
+                    max_test_dataset = eval_res_test
+                    max_epoch = current_epoch
+    print(f'max = {max_test_dataset} at {max_epoch}epoch')
+    return max_test_dataset, max_epoch
 
