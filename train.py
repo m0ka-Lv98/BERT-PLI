@@ -48,21 +48,25 @@ if __name__ == "__main__":
         raise NotImplementedError
 
     parameters = init_all(config, gpu_list, args.checkpoint, "train")
-    for i in range(8, 9):
-        config.set('model', 'label_weight', i)
-        p, r, f1, epochs = [], [], [], []
-        for j in range(5):
-            result, epoch = train(parameters, config, gpu_list)
-            parameters['model'] = get_model(config.get("model", "model_name"))(config, gpu_list, args.checkpoint, "train")
-            if len(gpu_list) > 0:
-                parameters['model'] = parameters['model'].cuda()
-                parameters['model'].init_multi_gpu(gpu_list, config, args.checkpoint, "train")
-            parameters['optimizer'] = init_optimizer(parameters['model'], config, args.checkpoint, "train")
-            p.append(result['precision'])
-            r.append(result['recall'])
-            f1.append(result['f1'])
-            epochs.append(epoch)
-            with open(f'./output/result_t2_label8.txt', 'a') as f:
-                f.write(f'p = {result["precision"]}, r = {result["recall"]}, f1 = {result["f1"]}, epoch = {epoch}\n')
-        with open(f'./output/result_t2_label8.txt', 'a') as f:
-            f.write(f'label_weight={i}, p = {np.mean(p)}±{np.std(p)}, r = {np.mean(r)}±{np.std(r)}, f1 = {np.mean(f1)}±{np.std(f1)}, epoch = {np.mean(epochs)}±{np.std(epochs)}\n')
+    if config.get('model', 'grid') == "True":
+        file_path = config.get('model', 'file_path')
+        for i in range(1, 11):
+            config.set('model', 'label_weight', i)
+            p, r, f1, epochs = [], [], [], []
+            for j in range(5):
+                result, epoch = train(parameters, config, gpu_list)
+                parameters['model'] = get_model(config.get("model", "model_name"))(config, gpu_list, args.checkpoint, "train")
+                if len(gpu_list) > 0:
+                    parameters['model'] = parameters['model'].cuda()
+                    parameters['model'].init_multi_gpu(gpu_list, config, args.checkpoint, "train")
+                parameters['optimizer'] = init_optimizer(parameters['model'], config, args.checkpoint, "train")
+                p.append(result['precision'])
+                r.append(result['recall'])
+                f1.append(result['f1'])
+                epochs.append(epoch)
+                with open(file_path, 'a') as f:
+                    f.write(f'p = {result["precision"]}, r = {result["recall"]}, f1 = {result["f1"]}, epoch = {epoch}\n')
+            with open(file_path, 'a') as f:
+                f.write(f'label_weight={i}, p = {np.mean(p)}±{np.std(p)}, r = {np.mean(r)}±{np.std(r)}, f1 = {np.mean(f1)}±{np.std(f1)}, epoch = {np.mean(epochs)}±{np.std(epochs)}\n')
+    else:
+        train(parameters, config, gpu_list)
