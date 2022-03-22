@@ -156,3 +156,58 @@ If you have any questions, please email shaoyq18@mails.tsinghua.edu.cn .
   year={2020}
 }
 ```
+
+# 追記
+
+## タスク１のデータ前処理
+```
+python task1_preprocess.py
+```
+
+## タスク２のデータ前処理
+```
+python task2_preprocess.py
+```
+
+## タスク２の事前学習
+```
+python train.py -c config/nlp/BertPoint.config -g [GPU番号]
+```
+
+BertPoint.configのgridをTrueにするとlabel_weightを1~10まで変えながら5回ずつ学習を行う
+
+`file_path`で保存先を指定する
+
+## タスク１の埋め込み
+```
+python poolout.py -c config/nlp/BertPoolOutMax.config -g [GPU番号] --checkpoint "./data/checkpoint/model_225/task2/label5.0_1.pkl" --result "./data/checkpoint/embedding_train_50_225.json"
+```
+
+```
+python poolout.py -c config/nlp/BertPoolOutMax.config -g [GPU番号] --checkpoint "./data/checkpoint/model_225/task2/label5.0_1.pkl" --result "./data/checkpoint/embedding_val_50_225.json"
+```
+
+```
+python poolout.py -c config/nlp/BertPoolOutMax.config -g [GPU番号] --checkpoint "./data/checkpoint/model_225/task2/label5.0_1.pkl" --result "./data/checkpoint/embedding_test_50_225.json"
+```
+
+--checkpoint: タスク２で保存されたモデル
+
+--result: 埋め込みデータ保存先
+
+BertPoolOutMax.configのtrain_data_path, train_file_listしか参照されないため、train, valid, testデータを適宜入力して実行する。そのため三回実行しなければならない。
+
+## タスク1の本学習（LSTM）
+```
+python train.py -c config/nlp/AttenLSTM.config -g [GPU番号]
+```
+AttenGRU.configのgridをTrueにするとlabel_weightを1~10まで変えながら5回ずつ学習を行う
+
+`file_path`で保存先を指定する
+## タスク1の本学習（GRU）
+```
+python train.py -c config/nlp/AttenGRU.config -g [GPU番号]
+```
+AttenGRU.configのgridをTrueにするとlabel_weightを1~10まで変えながら5回ずつ学習を行う
+
+`file_path`で保存先を指定する
