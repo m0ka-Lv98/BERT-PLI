@@ -125,7 +125,7 @@ def train(parameters, config, gpu_list):
             logger.error("There is no data given to the model in this epoch, check your data.")
             raise NotImplementedError
 
-        checkpoint(os.path.join(output_path, "%d.pkl" % current_epoch), model, optimizer, current_epoch, config,
+        checkpoint(os.path.join(output_path, f"label{config.getfloat('model', 'label_weight')}_{current_epoch}.pkl"), model, optimizer, current_epoch, config,
                    global_step)
         writer.add_scalar(config.get("output", "model_name") + "_train_epoch", float(total_loss) / (step + 1),
                           current_epoch)
