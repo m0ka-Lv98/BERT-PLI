@@ -52,8 +52,8 @@ if __name__ == "__main__":
 
     parameters = init_all(config, gpu_list, args.checkpoint, "poolout")
 
-    out_file = open(args.result, 'w', encoding='utf-8')
-    outputs = pool_out(parameters, config, gpu_list, args.result)
+    #out_file = open(args.result, 'w', encoding='utf-8')
+    pool_out(parameters, config, gpu_list, args.result)
     #out_line = ''
     #for output in outputs:
     #    tmp_dict = {
