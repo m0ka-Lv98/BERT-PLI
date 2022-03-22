@@ -18,14 +18,26 @@ class BertPoint(nn.Module):
 
         self.bert = BertModel.from_pretrained(config.get("model", "bert_path"))
         self.fc = nn.Linear(768, self.output_dim)
+        self.weight = self.init_weight(config, gpu_list)
         if self.output_mode == 'classification':
-            self.criterion = nn.CrossEntropyLoss()
+            self.criterion = nn.CrossEntropyLoss(weight=self.weight)
         else:
             self.criterion = nn.MSELoss()
         self.accuracy_function = init_accuracy_function(config, *args, **params)
 
     def init_multi_gpu(self, device, config, *args, **params):
         self.bert = nn.DataParallel(self.bert, device_ids=device)
+    
+    def init_weight(self, config, gpu_list):
+        try:
+            label_weight = config.getfloat('model', 'label_weight')
+        except Exception:
+            return None
+        weight_lst = torch.ones(self.output_dim)
+        weight_lst[-1] = label_weight
+        if torch.cuda.is_available() and len(gpu_list) > 0:
+            weight_lst = weight_lst.cuda()
+        return weight_lst
 
     def forward(self, data, config, gpu_list, acc_result, mode):
         input_ids, attention_mask, token_type_ids = data['input_ids'], data['attention_mask'], data['token_type_ids']
